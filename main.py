@@ -3,7 +3,7 @@ import subprocess
 
 
 def download():
-    cmd = downloader.decode('utf-8') + " -f 140 " + str(urlString.get())
+    cmd = downloader + " -f 140 " + str(urlString.get())
     for path in execute(cmd):
         print(path, end="")
 
@@ -23,7 +23,8 @@ def getClipboard():
 
 
 result = subprocess.run(['which', 'youtube-dl'], stdout=subprocess.PIPE)
-downloader = result.stdout.strip()
+downloader = result.stdout.strip().decode('utf-8')
+print(downloader)
 
 root = tk.Tk()
 root.title('Youtube-dl GUI')
