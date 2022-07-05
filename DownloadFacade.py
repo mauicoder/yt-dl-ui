@@ -10,7 +10,7 @@ class DownloadFacade:
 
     def download(self, urlstring):
         cmd = self.__downloader + " -f 140 " + str(urlstring.get())
-        print(cmd)
+        print("downloading: " + cmd)
         for path in self.__execute(cmd):
             print(path, end="")
         return
