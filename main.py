@@ -1,46 +1,42 @@
 import tkinter as tk
 import subprocess
+from DownloadFacade import DownloadFacade
 
 
-def download():
-    cmd = downloader + " -f 140 " + str(urlString.get())
-    for path in execute(cmd):
-        print(path, end="")
+class App(tk.Tk):
+    def __init__(self, root, download_facade):
+        root.title('Youtube-dl GUI')
+
+        # place a label on the root window
+        tk.Label(root, text=download_facade.get_downloader()).pack()
+        url_string = tk.StringVar(root, value='https://www.youtube.com/watch?v=K096sx5whTE')
+        url_entry = tk.Entry(root, textvariable=url_string)
+        url_entry.pack()
+
+        dw_button = tk.Button(root, text="Download", command=lambda: download_facade.download(url_string))
+        dw_button.pack()
+
+        dw_button = tk.Button(root, text="Paste", command=lambda: get_clipboard(url_string, root))
+        dw_button.pack()
 
 
-def execute(cmd):
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
-    for stdout_line in iter(popen.stdout.readline, ""):
-        yield stdout_line
-    popen.stdout.close()
-    return_code = popen.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(return_code, cmd)
+def get_clipboard(url_string, root):
+    url_string.set(root.clipboard_get())
 
 
-def getClipboard():
-    urlString.set(root.clipboard_get())
+def get_download_facade():
+    result = subprocess.run(['which', 'youtube-dl'], stdout=subprocess.PIPE)
+    downloader = result.stdout.strip().decode('utf-8')
+    print(downloader)
+    return DownloadFacade(downloader)
 
 
-result = subprocess.run(['which', 'youtube-dl'], stdout=subprocess.PIPE)
-downloader = result.stdout.strip().decode('utf-8')
-print(downloader)
-
-root = tk.Tk()
-root.title('Youtube-dl GUI')
-
-# place a label on the root window
-tk.Label(root, text=downloader).pack()
-urlString = tk.StringVar(root, value='https://www.youtube.com/watch?v=K096sx5whTE')
-urlEntry = tk.Entry(root, textvariable=urlString)
-urlEntry.pack()
-
-dwButton = tk.Button(root, text="Download", command=download)
-dwButton.pack()
-
-dwButton = tk.Button(root, text="Paste", command=getClipboard)
-dwButton.pack()
+def main():
+    download_facade = get_download_facade()
+    root = tk.Tk()
+    App(root, download_facade)
+    root.mainloop()
 
 
-# keep the window displaying
-root.mainloop()
+if __name__ == '__main__':
+    main()
