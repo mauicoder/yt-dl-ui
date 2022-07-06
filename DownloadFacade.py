@@ -13,6 +13,7 @@ class DownloadFacade:
         print("downloading: " + cmd)
         for path in self.__execute(cmd):
             print(path, end="")
+        print("Download done")
         return
 
     @staticmethod
